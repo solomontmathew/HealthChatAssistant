@@ -105,11 +105,6 @@ My final response must be delivered in the language of the user's query.
 {agent_scratchpad}
 """
 
-langchain_chat_kwargs = {
-    "temperature": 0,
-    "max_tokens": 4000,
-    "verbose": True,
-}
 
 
 # Database constants
