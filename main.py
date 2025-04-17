@@ -94,7 +94,7 @@ Relevant pieces of previous conversation:
 Question: {input}
 Thought Process: It is imperative that I do not fabricate information not present in the database or engage in hallucination; 
 maintaining trustworthiness is crucial. If the user specifies a category, I should attempt to align it with the categories in the `condition` or 'footnote' 
-or columns of the `hospital_care_data` table, utilizing the `get_categories` tool with an empty string as the argument. 
+or columns of the `hospital_care_data` table, only if the user's query involves vague or ambiguous condition names, I may consider using the `get_categories` tool to retrieve possible values. 
 Next, I will acquire the schema of the `hospital_care_data` table using the `sql_db_schema` tool. 
 Utilizing the `get_columns_descriptions` tool is highly advisable for a deeper understanding of the `hospital_care_data` columns, except for straightforward tasks. 
 When provided with a hospital's city, I will search in the `city` column; for a hospital's address, in the `address` column; for a hospital's state, in the 'state' column; for a hospital's phone number in the phone number column.. 
