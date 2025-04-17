@@ -265,13 +265,7 @@ def show_table_preview():
     st.sidebar.markdown("---")
     st.sidebar.subheader("View Table Data")
 
-    dbname = "postgres"
-    user = "postgres"
-    password = os.getenv("POSTGRES_PASSWORD", "Podamaire.123")
-    host = "localhost"
-    port = 5432
-
-    conn_str = f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{dbname}"
+    conn_str = os.getenv("DATABASE_URL", st.secrets.get("DATABASE_URL"))
     engine = create_engine(conn_str)
     inspector = inspect(engine)
     table_list = inspector.get_table_names()
@@ -370,13 +364,7 @@ def sql_agent_tools():
     ]
 
 
-connection = psycopg2.connect(
-    dbname=dbname,
-    user=user,
-    password=password,
-    host=host,
-    port=port
-)
+connection = os.getenv("DATABASE_URL", st.secrets.get("DATABASE_URL"))
 cursor = connection.cursor()
 table_name = "hospital_care_data"
 query = f"SELECT hospital_name FROM {table_name} WHERE city = 'Wedowee';"
