@@ -12,7 +12,7 @@ import plotly.express as px
 import streamlit as st
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", st.secrets.get("OPENAI_API_KEY"))
-POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD", st.secrets.get("POSTGRES_PASSWORD"))
+url = os.getenv("DATABASE_URL", st.secrets.get("DATABASE_URL"))
 
 dbname = user = "postgres"
 password = os.getenv("POSTGRES_PASSWORD", POSTGRES_PASSWORD)
@@ -81,8 +81,6 @@ from langchain.agents import AgentExecutor
 from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.messages import HumanMessage, AIMessage, BaseMessage
 
-
-url = f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{dbname}"
 TABLE_NAME = "hospital_care_data"
 
 db = SQLDatabase.from_uri(
