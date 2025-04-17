@@ -224,7 +224,7 @@ def create_general_qa_agent(model_name="gpt-4-1106-preview"):
 
 
 def pipeline_agent(question: str):
-    sql_agent = create_agent()
+    sql_agent = create_combined_agent()
     sql_result = sql_agent.invoke({"input": question})["output"]
     print("[DEBUG] SQL Result:", sql_result)
 
@@ -246,7 +246,7 @@ pipeline_tool = Tool.from_function(
 
 def create_combined_agent(model_name="gpt-4-1106-preview", memory=None):
     llm = get_chat_openai(model_name)
-    tools = sql_agent_tools() + [pipeline_tool]
+    tools = sql_agent_tools()
     memory = memory or ConversationBufferMemory(memory_key="history", input_key="input", return_messages=True)
     _clean_memory_if_invalid(memory)
     agent_core = create_openai_functions_agent(llm=llm, tools=tools, prompt=DEFAULT_PROMPT)
