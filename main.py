@@ -292,7 +292,7 @@ def show_table_preview():
 
 def run_query_save_results(dbx, queryx):
     res = dbx.run(queryx)
-    res = [el for sub in ast.literal_eval(res) for el in sub]
+    eturn [row[0] if len(row) == 1 else row for row in res] 
     return res
 
 
@@ -335,20 +335,6 @@ def get_today_date(queryx: str) -> str:
 
 
 def sql_agent_tools():
-    def get_categories(_: str) -> str:
-        cat1 = run_query_save_results(db, "SELECT DISTINCT condition from hospital_care_data")
-        cat2 = run_query_save_results(db, "SELECT DISTINCT footnote from hospital_care_data")
-        return (
-            "List of unique values in condition column:\n" + json.dumps(cat1, ensure_ascii=False) +
-            "\nList of unique values in footnote column:\n" + json.dumps(cat2, ensure_ascii=False)
-        )
-
-    def get_columns_descriptions(_: str) -> str:
-        return json.dumps(COLUMNS_DESCRIPTIONS)
-
-    def get_today_date(_: str) -> str:
-        return datetime.now().strftime("%Y-%m-%d")
-
     return [
         Tool.from_function(func=get_categories, name="get_categories", description="Returns unique condition and footnote values as categories."),
         Tool.from_function(func=get_columns_descriptions, name="get_columns_descriptions", description="Provides descriptions of columns in hospital_care_data."),
