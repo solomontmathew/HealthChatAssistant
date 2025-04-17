@@ -292,8 +292,7 @@ def show_table_preview():
 
 def run_query_save_results(dbx, queryx):
     res = dbx.run(queryx)
-    eturn [row[0] if len(row) == 1 else row for row in res] 
-    return res
+    return [row[0] if len(row) == 1 else row for row in res] 
 
 
 def get_categories(queryx: str) -> str:
