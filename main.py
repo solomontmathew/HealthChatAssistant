@@ -224,7 +224,7 @@ def create_general_qa_agent(model_name="gpt-4-1106-preview"):
 
 
 def pipeline_agent(question: str):
-    sql_agent = create_combined_agent()
+    sql_agent = create_agent()
     sql_result = sql_agent.invoke({"input": question})["output"]
     print("[DEBUG] SQL Result:", sql_result)
 
