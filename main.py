@@ -172,7 +172,7 @@ def get_agent_llm(agent_llm_name: str):
     return llm_agent
 
 
-def create_agent(
+ef create_agent(
         tool_llm_name: str = "gpt-4-1106-preview",
         agent_llm_name: str = "gpt-4-1106-preview",
         memory: ConversationBufferMemory=None,):
@@ -182,9 +182,9 @@ def create_agent(
             agent_llm_name (str, optional): name of the agent LLM, defaults to "gpt-4-1106-preview".
         returns:
             agent: the created SQL agent. """
-    toolkit = get_sql_toolkit(tool_llm_name)
-    agent_tools = toolkit.get_tools() + sql_agent_tools()
+    agent_tools = sql_agent_tools()
     llm_agent = get_agent_llm(agent_llm_name)
+    toolkit = get_sql_toolkit(tool_llm_name)
     memory = memory or ConversationBufferMemory(memory_key="history", input_key="input")
 
     agent = create_sql_agent(
