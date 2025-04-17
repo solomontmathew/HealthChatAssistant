@@ -364,7 +364,7 @@ def sql_agent_tools():
     ]
 
 
-conn_str = os.getenv("DATABASE_URL", st.secrets.get("DATABASE_URL"))
+conn_str = os.getenv("DB_URL2", st.secrets.get("DB_URL2"))
 connection = psycopg2.connect(conn_str)
 cursor = connection.cursor()
 table_name = "hospital_care_data"
