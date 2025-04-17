@@ -138,6 +138,7 @@ hospital_care_data = [
     "location",
 ]
 
+
 def get_chat_openai(model_name):
     """ return instance of the ChatOpenAI class intialized with the specifed model name.
         args: model_name (str): name of model to use
@@ -150,7 +151,6 @@ def get_chat_openai(model_name):
         **langchain_chat_kwargs
     )
     return llm
-
 
 
 def get_sql_toolkit(tool_llm_name: str):
@@ -182,7 +182,7 @@ def create_agent(
             agent_llm_name (str, optional): name of the agent LLM, defaults to "gpt-4-1106-preview".
         returns:
             agent: the created SQL agent. """
-    agent_tools = toolkit.get_tools() + sql_agent_tools()
+    agent_tools = sql_agent_tools()
     llm_agent = get_agent_llm(agent_llm_name)
     toolkit = get_sql_toolkit(tool_llm_name)
     memory = memory or ConversationBufferMemory(memory_key="history", input_key="input")
@@ -193,7 +193,7 @@ def create_agent(
         toolkit=toolkit,
         input_variables=["input", "agent_scratchpad", "history"],
         suffix=CUSTOM_SUFFIX,
-        agent_executor_kwargs={"memory": memory},
+        agent_executor_kwargs={"memory": memory, "handle_parsing_errors": True},
         extra_tools=agent_tools,
         verbose=True,
     )
@@ -221,7 +221,7 @@ def create_metadata_agent(model_name="gpt-4-1106-preview", memory=None):
     memory = memory or ConversationBufferMemory(memory_key="history", input_key="input", return_messages=True)
     _clean_memory_if_invalid(memory)
     agent_core = create_openai_functions_agent(llm=llm, tools=tools, prompt=DEFAULT_PROMPT)
-    return AgentExecutor(agent=agent_core, tools=tools, memory=memory, verbose=True, handle_parsing_errors=True)
+    return AgentExecutor(agent=agent_core, tools=tools, memory=memory, verbose=True)
 
 
 def create_general_qa_agent(model_name="gpt-4-1106-preview"):
@@ -254,18 +254,24 @@ pipeline_tool = Tool.from_function(
 
 def create_combined_agent(model_name="gpt-4-1106-preview", memory=None):
     llm = get_chat_openai(model_name)
-    tools = sql_agent_tools()
+    tools = sql_agent_tools() + [pipeline_tool]
     memory = memory or ConversationBufferMemory(memory_key="history", input_key="input", return_messages=True)
     _clean_memory_if_invalid(memory)
     agent_core = create_openai_functions_agent(llm=llm, tools=tools, prompt=DEFAULT_PROMPT)
-    return AgentExecutor(agent=agent_core, tools=tools, memory=memory, verbose=True, handle_parsing_errors=True)
+    return AgentExecutor(agent=agent_core, tools=tools, memory=memory, verbose=True)
 
 
 def show_table_preview():
     st.sidebar.markdown("---")
     st.sidebar.subheader("View Table Data")
 
-    conn_str = os.getenv("DATABASE_URL", st.secrets.get("DATABASE_URL"))
+    dbname = "postgres"
+    user = "postgres"
+    password = os.getenv("POSTGRES_PASSWORD", "Podamaire.123")
+    host = "localhost"
+    port = 5432
+
+    conn_str = f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{dbname}"
     engine = create_engine(conn_str)
     inspector = inspect(engine)
     table_list = inspector.get_table_names()
@@ -304,6 +310,29 @@ def run_query_save_results(dbx, queryx):
     return res
 
 
+def get_categories(queryx: str) -> str:
+    # for categories/subcategories. a json is returned where the key is category/subcategory and value is list of unique items for both
+    cat1 = run_query_save_results(
+        db, "SELECT DISTINCT condition from hospital_care_data"
+    )
+    cat2 = run_query_save_results(
+        db, "SELECT DISTINCT footnote from hospital_care_data"
+    )
+    cat1_str = (
+            "List of unique values in condition column : \n"
+            + json.dumps(cat1, ensure_ascii=False)
+    )
+    cat2_str = (
+            "\n List of unique values in footnote column: \n"
+            + json.dumps(cat2, ensure_ascii=False)
+    )
+
+    return cat1_str + cat2_str
+
+
+"""get_columns_descriptions tool returns short descriptions for every ambiguous column"""
+
+
 def get_columns_descriptions(queryx: str) -> str:
     """useful for retrieving desscription of the columns in hospital_care_data table"""
     return json.dumps(COLUMNS_DESCRIPTIONS)
@@ -339,7 +368,6 @@ def sql_agent_tools():
         Tool.from_function(func=get_columns_descriptions, name="get_columns_descriptions", description="Provides descriptions of columns in hospital_care_data."),
         Tool.from_function(func=get_today_date, name="get_today_date", description="Provides today's date."),
     ]
-
 
 conn_str = os.getenv("DB_URL2", st.secrets.get("DB_URL2"))
 connection = psycopg2.connect(conn_str)
