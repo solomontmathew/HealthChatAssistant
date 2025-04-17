@@ -174,9 +174,9 @@ def create_agent(
             agent_llm_name (str, optional): name of the agent LLM, defaults to "gpt-4-1106-preview".
         returns:
             agent: the created SQL agent. """
-    agent_tools = sql_agent_tools()
-    llm_agent = get_agent_llm(agent_llm_name)
     toolkit = get_sql_toolkit(tool_llm_name)
+    agent_tools = toolkit.get_tools() + sql_agent_tools()
+    llm_agent = get_agent_llm(agent_llm_name)
     memory = memory or ConversationBufferMemory(memory_key="history", input_key="input")
 
     agent = create_sql_agent(
