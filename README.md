@@ -1,7 +1,7 @@
 # HealthChatAssistant
 A chat assistant made up of langchain agents that answer health-related questions using a Medicare/Medicare dataset pertaining to location, measures for conditions, scores, etc.
 
-The SQL AGENT WILL TAKE 4-6 maybe even up to 10 minutes to generate and complete the query depending on the question. This is because schema/column_descriptions/extra sql tools could be further optimized.
+The SQL AGENT WILL TAKE 4-6 minutes to generate and complete the query depending on the question. This is because schema/column_descriptions/extra sql tools could be further optimized.
 
 Download both files into a new folder/directory. 
 cd into that folder and run streamlit run main.py. Make sure you have python and streamlit installed. 
