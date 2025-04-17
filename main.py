@@ -14,11 +14,6 @@ import streamlit as st
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", st.secrets.get("OPENAI_API_KEY"))
 url = os.getenv("DATABASE_URL", st.secrets.get("DATABASE_URL"))
 
-dbname = user = "postgres"
-password = os.getenv("POSTGRES_PASSWORD", POSTGRES_PASSWORD)
-host = "localhost"
-port = 5432
-
 COLUMNS_TO_NORMALIZE = [
     "phone_number",
     "condition",
