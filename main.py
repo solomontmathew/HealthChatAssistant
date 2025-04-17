@@ -110,11 +110,7 @@ langchain_chat_kwargs = {
     "max_tokens": 4000,
     "verbose": True,
 }
-chat_openai_model_kwargs = {
-    "top_p": 1.0,
-    "frequency_penalty": 0.0,
-    "presence_penalty": -1,
-}
+
 
 # Database constants
 hospital_care_data = [
@@ -138,19 +134,20 @@ hospital_care_data = [
     "location",
 ]
 
-
 def get_chat_openai(model_name):
-    """ return instance of the ChatOpenAI class intialized with the specifed model name.
-        args: model_name (str): name of model to use
-        returns:
-        ChatOpenAI: instance of the ChatOpenAI class """
+    """Return an instance of ChatOpenAI initialized with the specified model name."""
     llm = ChatOpenAI(
         openai_api_key=OPENAI_API_KEY,
         model_name=model_name,
-        model_kwargs=chat_openai_model_kwargs,
-        **langchain_chat_kwargs
+        top_p=1.0,
+        frequency_penalty=0.0,
+        presence_penalty=-1.0,
+        temperature=0.2,  
+        # stream=True,  # optional
+        # max_tokens=500,  # optional
     )
     return llm
+
 
 
 def get_sql_toolkit(tool_llm_name: str):
