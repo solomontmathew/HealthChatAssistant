@@ -94,7 +94,7 @@ Relevant pieces of previous conversation:
 Question: {input}
 Thought Process: It is imperative that I do not fabricate information not present in the database or engage in hallucination; 
 maintaining trustworthiness is crucial. If the user specifies a category, I should attempt to align it with the categories in the `condition` or 'footnote' 
-or columns of the `hospital_care_data` table, only if the user's query involves vague or ambiguous condition names, I may consider using the `get_categories` tool to retrieve possible values. 
+or columns of the `hospital_care_data` table, utilizing the `get_categories` tool with an empty string as the argument. 
 Next, I will acquire the schema of the `hospital_care_data` table using the `sql_db_schema` tool. 
 Utilizing the `get_columns_descriptions` tool is highly advisable for a deeper understanding of the `hospital_care_data` columns, except for straightforward tasks. 
 When provided with a hospital's city, I will search in the `city` column; for a hospital's address, in the `address` column; for a hospital's state, in the 'state' column; for a hospital's phone number in the phone number column.. 
@@ -105,7 +105,16 @@ My final response must be delivered in the language of the user's query.
 {agent_scratchpad}
 """
 
-
+langchain_chat_kwargs = {
+    "temperature": 0,
+    "max_tokens": 4000,
+    "verbose": True,
+}
+chat_openai_model_kwargs = {
+    "top_p": 1.0,
+    "frequency_penalty": 0.0,
+    "presence_penalty": -1,
+}
 
 # Database constants
 hospital_care_data = [
@@ -130,16 +139,15 @@ hospital_care_data = [
 ]
 
 def get_chat_openai(model_name):
-    """Return an instance of ChatOpenAI initialized with the specified model name."""
+    """ return instance of the ChatOpenAI class intialized with the specifed model name.
+        args: model_name (str): name of model to use
+        returns:
+        ChatOpenAI: instance of the ChatOpenAI class """
     llm = ChatOpenAI(
         openai_api_key=OPENAI_API_KEY,
         model_name=model_name,
-        top_p=1.0,
-        frequency_penalty=0.0,
-        presence_penalty=-1.0,
-        temperature=0.2,  
-        # stream=True,  # optional
-        # max_tokens=500,  # optional
+        model_kwargs=chat_openai_model_kwargs,
+        **langchain_chat_kwargs
     )
     return llm
 
@@ -296,29 +304,6 @@ def run_query_save_results(dbx, queryx):
     return res
 
 
-def get_categories(queryx: str) -> str:
-    # for categories/subcategories. a json is returned where the key is category/subcategory and value is list of unique items for both
-    cat1 = run_query_save_results(
-        db, "SELECT DISTINCT condition from hospital_care_data"
-    )
-    cat2 = run_query_save_results(
-        db, "SELECT DISTINCT footnote from hospital_care_data"
-    )
-    cat1_str = (
-            "List of unique values in condition column : \n"
-            + json.dumps(cat1, ensure_ascii=False)
-    )
-    cat2_str = (
-            "\n List of unique values in footnote column: \n"
-            + json.dumps(cat2, ensure_ascii=False)
-    )
-
-    return cat1_str + cat2_str
-
-
-"""get_columns_descriptions tool returns short descriptions for every ambiguous column"""
-
-
 def get_columns_descriptions(queryx: str) -> str:
     """useful for retrieving desscription of the columns in hospital_care_data table"""
     return json.dumps(COLUMNS_DESCRIPTIONS)
@@ -335,6 +320,20 @@ def get_today_date(queryx: str) -> str:
 
 
 def sql_agent_tools():
+    def get_categories(_: str) -> str:
+        cat1 = run_query_save_results(db, "SELECT DISTINCT condition from hospital_care_data")
+        cat2 = run_query_save_results(db, "SELECT DISTINCT footnote from hospital_care_data")
+        return (
+            "List of unique values in condition column:\n" + json.dumps(cat1, ensure_ascii=False) +
+            "\nList of unique values in footnote column:\n" + json.dumps(cat2, ensure_ascii=False)
+        )
+
+    def get_columns_descriptions(_: str) -> str:
+        return json.dumps(COLUMNS_DESCRIPTIONS)
+
+    def get_today_date(_: str) -> str:
+        return datetime.now().strftime("%Y-%m-%d")
+
     return [
         Tool.from_function(func=get_categories, name="get_categories", description="Returns unique condition and footnote values as categories."),
         Tool.from_function(func=get_columns_descriptions, name="get_columns_descriptions", description="Provides descriptions of columns in hospital_care_data."),
