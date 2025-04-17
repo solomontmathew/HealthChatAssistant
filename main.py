@@ -213,7 +213,7 @@ def create_metadata_agent(model_name="gpt-4-1106-preview", memory=None):
     memory = memory or ConversationBufferMemory(memory_key="history", input_key="input", return_messages=True)
     _clean_memory_if_invalid(memory)
     agent_core = create_openai_functions_agent(llm=llm, tools=tools, prompt=DEFAULT_PROMPT)
-    return AgentExecutor(agent=agent_core, tools=tools, memory=memory, verbose=True)
+    return AgentExecutor(agent=agent_core, tools=tools, memory=memory, verbose=True, handle_parsing_errors=True)
 
 
 def create_general_qa_agent(model_name="gpt-4-1106-preview"):
@@ -250,7 +250,7 @@ def create_combined_agent(model_name="gpt-4-1106-preview", memory=None):
     memory = memory or ConversationBufferMemory(memory_key="history", input_key="input", return_messages=True)
     _clean_memory_if_invalid(memory)
     agent_core = create_openai_functions_agent(llm=llm, tools=tools, prompt=DEFAULT_PROMPT)
-    return AgentExecutor(agent=agent_core, tools=tools, memory=memory, verbose=True)
+    return AgentExecutor(agent=agent_core, tools=tools, memory=memory, verbose=True, handle_parsing_errors=True)
 
 
 def show_table_preview():
