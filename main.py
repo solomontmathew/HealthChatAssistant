@@ -172,7 +172,7 @@ def get_agent_llm(agent_llm_name: str):
     return llm_agent
 
 
-ef create_agent(
+def create_agent(
         tool_llm_name: str = "gpt-4-1106-preview",
         agent_llm_name: str = "gpt-4-1106-preview",
         memory: ConversationBufferMemory=None,):
