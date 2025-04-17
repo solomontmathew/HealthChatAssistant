@@ -291,15 +291,9 @@ def show_table_preview():
 
 
 def run_query_save_results(dbx, queryx):
-    try:
-        res = dbx.run(queryx)
-        if res:
-            parsed = ast.literal_eval(res)
-            return [el for sub in parsed for el in sub]
-        return []
-    except Exception as e:
-        print("[SQL ERROR]", str(e))
-        return []
+    res = dbx.run(queryx)
+    res = [el for sub in ast.literal_eval(res) for el in sub]
+    return res
 
 
 def get_categories(queryx: str) -> str:
