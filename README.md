@@ -8,4 +8,6 @@ Dependencies/libraries utilized should be attached in a separate requirements.tx
 
 Please note that clicking reset chat does not actually reset the chat, it resets the chat log.conversation memory, but reloading the website will keep the previous prompts and text.
 
+When downloading chat log, you must enter more than two prompts for the json file to be populated.
+
 
