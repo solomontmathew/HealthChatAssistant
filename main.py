@@ -364,7 +364,8 @@ def sql_agent_tools():
     ]
 
 
-connection = os.getenv("DATABASE_URL", st.secrets.get("DATABASE_URL"))
+conn_str = os.getenv("DATABASE_URL", st.secrets.get("DATABASE_URL"))
+connection = psycopg2.connect(conn_str)
 cursor = connection.cursor()
 table_name = "hospital_care_data"
 query = f"SELECT hospital_name FROM {table_name} WHERE city = 'Wedowee';"
